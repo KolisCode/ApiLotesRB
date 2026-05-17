@@ -47,29 +47,27 @@ export class LotesService {
         ...data,
         servicios: servicios ? { create: servicios } : undefined,
       },
-      include: { servicios: true },
+      select: this.publicSelect,
     });
   }
 
   async update(id: number, dto: UpdateLoteDto) {
     await this.findOne(id);
     const { servicios, ...data } = dto;
-
     return this.prisma.lote.update({
       where: { id },
       data: {
         ...data,
-        servicios: servicios
-          ? { deleteMany: {}, create: servicios }
-          : undefined,
+        servicios: servicios ? { deleteMany: {}, create: servicios } : undefined,
       },
-      include: { servicios: true },
+      select: this.publicSelect,
     });
   }
 
   async remove(id: number) {
     await this.findOne(id);
-    return this.prisma.lote.delete({ where: { id } });
+    await this.prisma.lote.delete({ where: { id } });
+    return { id };
   }
 
   stats() {

@@ -6,9 +6,14 @@ const prisma = new PrismaClient();
 const BCRYPT_ROUNDS = 12;
 
 async function main() {
-  const email  = process.env.SEED_ADMIN_EMAIL    ?? 'admin@lotesrb.com';
-  const pass   = process.env.SEED_ADMIN_PASSWORD ?? 'admin1234';
-  const nombre = process.env.SEED_ADMIN_NOMBRE   ?? 'Administrador';
+  const email  = process.env.SEED_ADMIN_EMAIL  ?? 'admin@lotesrb.com';
+  const pass   = process.env.SEED_ADMIN_PASSWORD;
+  const nombre = process.env.SEED_ADMIN_NOMBRE ?? 'Administrador';
+
+  if (!pass) {
+    console.error('Error: SEED_ADMIN_PASSWORD debe estar definido en .env');
+    process.exit(1);
+  }
 
   const hash = await bcrypt.hash(pass, BCRYPT_ROUNDS);
   await prisma.admin.upsert({

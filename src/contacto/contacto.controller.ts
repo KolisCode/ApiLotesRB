@@ -1,4 +1,5 @@
 import { Controller, Post, Get, Patch, Param, Body, Query, UseGuards, ParseIntPipe } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { ContactoService } from './contacto.service';
 import { CreateContactoDto } from './contacto.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -8,6 +9,7 @@ export class ContactoController {
   constructor(private readonly service: ContactoService) {}
 
   @Post()
+  @Throttle({ default: { ttl: 60000, limit: 5 } })
   async create(@Body() dto: CreateContactoDto) {
     const contacto = await this.service.create(dto);
     return { message: 'Mensaje recibido', id: contacto.id };
