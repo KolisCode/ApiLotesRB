@@ -5,7 +5,7 @@
 ![Prisma](https://img.shields.io/badge/Prisma-5-2D3748?logo=prisma&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
 
-> API del portal inmobiliario LotesRB. **Frontend:** [lotesrb-frontend](https://github.com/TU_USUARIO/lotesrb-frontend) · **Demo:** [lotesrb.kolisevm.online](https://lotesrb.kolisevm.online)
+> API del portal inmobiliario LotesRB. **Frontend:** [lotesRB](https://github.com/KolisCode/lotesRB) · **Demo:** [lotesrb.kolisevm.online](https://lotesrb.kolisevm.online)
 
 Backend del proyecto Robinson. REST API construida con NestJS + Prisma + PostgreSQL. Gestiona lotes, autenticación de administradores, mensajes de contacto y subida de imágenes.
 
