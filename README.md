@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/KolisCode/lotesRB/master/screenshots/readme-banner.png" alt="KolisCode Banner" width="100%"/>
+</p>
+
 # LotesRB — API
 
 ![NestJS](https://img.shields.io/badge/NestJS-11-E0234E?logo=nestjs&logoColor=white)
