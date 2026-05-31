@@ -1,0 +1,100 @@
+# LotesRB API — Backend NestJS
+
+API REST para el sistema de lotes inmobiliarios Robinson. NestJS 11 + Prisma + PostgreSQL + JWT.
+
+**Instrucción:** Mantén este archivo actualizado de forma proactiva. Si en una conversación surge información útil — decisiones de arquitectura, endpoints nuevos, variables de entorno — actualiza la sección correspondiente.
+
+---
+
+## Stack
+
+| Capa | Tecnología |
+|---|---|
+| Framework | NestJS 11 |
+| ORM | Prisma 5 + `@prisma/client` |
+| Base de datos | PostgreSQL (variable `DATABASE_URL`) |
+| Auth | JWT (`@nestjs/jwt` + `passport-jwt`), 2 horas, sin refresh token |
+| Validación | `class-validator` + `class-transformer` + `ValidationPipe` global |
+| Rate limiting | `@nestjs/throttler` — 60/min global, 5/min en login y contacto, 10/min en upload |
+| Seguridad | Helmet, CORS desde `CORS_ORIGINS`, throttling global |
+| Config | `@nestjs/config` + Joi (variables validadas al arranque) |
+| Puerto | `PORT` env (default 3001) |
+
+## Variables de entorno requeridas
+
+```env
+DATABASE_URL=           # PostgreSQL connection string
+JWT_SECRET=             # mínimo 32 caracteres
+JWT_EXPIRES_IN=2h       # default
+PORT=3001               # default
+CORS_ORIGINS=           # origen(es) permitidos
+```
+
+## Módulos
+
+```
+src/
+├── auth/               ← login + JWT strategy + guard
+│   ├── auth.controller.ts   — @Throttle 5/min
+│   ├── auth.service.ts
+│   └── jwt.strategy.ts
+├── lotes/              ← catálogo público + CRUD admin
+│   ├── lotes.controller.ts
+│   ├── lotes.service.ts
+│   └── lotes.dto.ts    — valida lat/lng (-90/90 y -180/180)
+├── contacto/           ← formulario de contacto público
+│   └── contacto.controller.ts  — @Throttle 5/min
+├── upload/             ← subida de imágenes de lotes
+│   └── upload.controller.ts    — @Throttle 10/min
+├── prisma/             ← PrismaService singleton
+└── app.module.ts       ← ThrottlerModule + ConfigModule global
+```
+
+## Schema Prisma (entidades principales)
+
+```prisma
+model Lote {
+  id          Int        @id @default(autoincrement())
+  numero      String
+  manzana     String
+  area        Float
+  precio      Float
+  ubicacion   String
+  estado      EstadoLote @default(DISPONIBLE)
+  descripcion String?
+  imagen      String?
+  latitud     Float?
+  longitud    Float?
+  servicios   Servicio[]
+}
+
+enum EstadoLote { DISPONIBLE RESERVADO VENDIDO }
+```
+
+## Autenticación
+
+- Solo existe un modelo `Admin` (no usuarios públicos)
+- Guard `JwtAuthGuard` protege todos los endpoints `/admin/*`
+- Token en header `Authorization: Bearer {token}`
+- Sin refresh tokens — al vencer, el cliente debe hacer login de nuevo
+
+## Lo que falta
+
+- `@nestjs/swagger` — API sin documentación OpenAPI. Prioridad alta.
+- Global exception filter — errores sin formato centralizado
+- Tests reales — solo boilerplate en `test/`
+
+## Comandos
+
+```bash
+npm run start:dev       # dev con hot reload
+npm run build           # compila a dist/
+npx prisma studio       # UI visual de la base de datos
+npx prisma db push      # aplica cambios del schema
+npm run seed            # seed inicial de datos
+```
+
+## Deploy en producción
+
+El servidor corre en el droplet en `104.236.122.146`.
+La API no se sirve directamente — Nginx hace proxy desde `lotesrb.kolisevm.online/api` → `localhost:3001`.
