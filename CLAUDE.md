@@ -96,5 +96,18 @@ npm run seed            # seed inicial de datos
 
 ## Deploy en producción
 
-El servidor corre en el droplet en `104.236.122.146`.
+El servidor corre en el droplet en `104.236.122.146`, en `/opt/lotesrb-api` (PM2 `lotesrb-api`, :3001).
 La API no se sirve directamente — Nginx hace proxy desde `lotesrb.koliscode.com/api` → `localhost:3001`.
+
+**Flujo real de deploy (comprobado 2026-07-02):** el repo del droplet **no tiene remote git**
+ni devDependencies (`nest: not found`), así que el flujo git-pull de `deploy_project` del
+MCP **no funciona**. Deploy correcto:
+
+```bash
+npm run build                                        # build local
+# rsync de dist/ → droplet:/opt/lotesrb-api/dist/   (deploy_static del MCP droplet)
+ssh droplet "pm2 restart lotesrb-api"
+```
+
+Pendiente decidir si se configura un deploy key para `KolisCode/ApiLotesRB` y se
+normaliza al flujo git-pull.
