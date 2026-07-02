@@ -21,7 +21,7 @@ export class UploadController {
   @ApiOperation({ summary: 'Subir imagen de lote (admin)' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({ schema: { type: 'object', properties: { file: { type: 'string', format: 'binary' } } } })
-  @ApiResponse({ status: 201, description: 'URL de la imagen subida', schema: { example: { url: 'https://lotesrb.kolisevm.online/uploads/lote-123.jpg' } } })
+  @ApiResponse({ status: 201, description: 'URL de la imagen subida', schema: { example: { url: 'https://lotesrb.koliscode.com/uploads/lote-123.jpg' } } })
   @ApiResponse({ status: 400, description: 'Archivo inválido o ausente' })
   @ApiResponse({ status: 401, description: 'No autorizado' })
   @UseInterceptors(FileInterceptor('file', {

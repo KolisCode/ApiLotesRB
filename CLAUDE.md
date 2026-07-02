@@ -97,4 +97,4 @@ npm run seed            # seed inicial de datos
 ## Deploy en producción
 
 El servidor corre en el droplet en `104.236.122.146`.
-La API no se sirve directamente — Nginx hace proxy desde `lotesrb.kolisevm.online/api` → `localhost:3001`.
+La API no se sirve directamente — Nginx hace proxy desde `lotesrb.koliscode.com/api` → `localhost:3001`.
