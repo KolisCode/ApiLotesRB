@@ -10,7 +10,7 @@ export const DEFAULT_SITE_CONFIG = {
   email: 'contacto@lotesrb.com',
   direccion: 'Colombia',
   horario: 'Lunes a sábado · 8:00 a.m. – 6:00 p.m.',
-  marca: 'LotesRB',
+  marca: 'TuLote',
   tagline: 'Tu terreno, tu futuro.',
   heroEyebrow: 'Proyecto residencial · Lotes desde 160 m²',
   heroTitulo: 'Tu terreno propio, al alcance de tu mano',
