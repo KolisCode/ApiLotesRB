@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+import { DEFAULT_SITE_CONFIG } from '../src/site-config/site-config.defaults';
 
 const prisma = new PrismaClient();
 const BCRYPT_ROUNDS = 12;
@@ -81,6 +82,14 @@ async function main() {
       create: { ...data, servicios: { create: servicios } },
     });
   }
+
+  // Configuración del sitio (fila única id=1) — solo la crea si no existe,
+  // para no pisar los textos que el admin haya editado.
+  await prisma.siteConfig.upsert({
+    where: { id: DEFAULT_SITE_CONFIG.id },
+    update: {},
+    create: DEFAULT_SITE_CONFIG,
+  });
 
   console.log(`Seed completado. Admin creado: ${email}`);
 }

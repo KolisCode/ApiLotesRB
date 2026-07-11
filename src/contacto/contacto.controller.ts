@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Patch, Param, Body, Query, UseGuards, ParseIntPipe } from '@nestjs/common';
+import { Controller, Post, Get, Patch, Delete, Param, Body, Query, UseGuards, ParseIntPipe } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { ContactoService } from './contacto.service';
@@ -39,5 +39,16 @@ export class ContactoController {
   @ApiResponse({ status: 401, description: 'No autorizado' })
   marcarLeido(@Param('id', ParseIntPipe) id: number) {
     return this.service.marcarLeido(id);
+  }
+
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Eliminar mensaje de contacto (admin)' })
+  @ApiResponse({ status: 200, description: 'Mensaje eliminado' })
+  @ApiResponse({ status: 401, description: 'No autorizado' })
+  @ApiResponse({ status: 404, description: 'Mensaje no encontrado' })
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.service.remove(id);
   }
 }

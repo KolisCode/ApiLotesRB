@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateContactoDto } from './contacto.dto';
 
@@ -31,5 +31,12 @@ export class ContactoService {
 
   marcarLeido(id: number) {
     return this.prisma.contacto.update({ where: { id }, data: { leido: true } });
+  }
+
+  async remove(id: number) {
+    const existe = await this.prisma.contacto.findUnique({ where: { id } });
+    if (!existe) throw new NotFoundException(`Mensaje #${id} no encontrado`);
+    await this.prisma.contacto.delete({ where: { id } });
+    return { id };
   }
 }

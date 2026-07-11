@@ -1,16 +1,22 @@
 import 'dotenv/config';
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
+import { join } from 'path';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/http-exception.filter';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   app.use(helmet({ contentSecurityPolicy: false }));
   app.useGlobalFilters(new HttpExceptionFilter());
+
+  // Sirve las imágenes subidas (hero, branding, lotes) en /uploads.
+  // En producción Nginx debe enrutar /uploads → este backend (o servir el dir directamente).
+  app.useStaticAssets(join(process.cwd(), 'uploads'), { prefix: '/uploads/' });
 
   app.useGlobalPipes(new ValidationPipe({
     whitelist: true,

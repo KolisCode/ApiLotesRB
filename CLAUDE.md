@@ -44,8 +44,13 @@ src/
 │   └── lotes.dto.ts    — valida lat/lng (-90/90 y -180/180)
 ├── contacto/           ← formulario de contacto público
 │   └── contacto.controller.ts  — @Throttle 5/min
-├── upload/             ← subida de imágenes de lotes
-│   └── upload.controller.ts    — @Throttle 10/min
+├── upload/             ← subida de imágenes (lotes, hero, branding) — @Throttle 10/min
+│   └── upload.controller.ts    — ⚠️ ya montado en app.module (antes estaba huérfano)
+├── site-config/        ← configuración editable del sitio público (singleton id=1)
+│   ├── site-config.controller.ts  — GET público · PUT (JWT)
+│   ├── site-config.service.ts
+│   ├── site-config.dto.ts         — whatsapp = 7-15 dígitos
+│   └── site-config.defaults.ts    — defaults compartidos con prisma/seed.ts
 ├── prisma/             ← PrismaService singleton
 └── app.module.ts       ← ThrottlerModule + ConfigModule global
 ```
@@ -68,8 +73,16 @@ model Lote {
   servicios   Servicio[]
 }
 
-enum EstadoLote { DISPONIBLE RESERVADO VENDIDO }
+enum EstadoLote { disponible reservado vendido }   // ⚠️ minúsculas en el código real
 ```
+
+Además existe `model SiteConfig` (fila única id=1) con la config editable del sitio:
+contacto (whatsapp/telefono/email/direccion/horario), branding (marca/tagline), hero*,
+`ventajas` (Json) y **la página Proyecto** (proyectoMunicipio/Nombre/Descripcion,
+`distancias`/`infraestructura`/`pasos` Json, financiacion*).
+
+`Contacto.loteId` es **FK real** a `Lote` con `onDelete: SetNull` (migración `contacto_lote_fk`).
+El módulo contacto expone `DELETE /contacto/:id` (admin).
 
 ## Autenticación
 
@@ -80,9 +93,11 @@ enum EstadoLote { DISPONIBLE RESERVADO VENDIDO }
 
 ## Lo que falta
 
-- `@nestjs/swagger` — API sin documentación OpenAPI. Prioridad alta.
-- Global exception filter — errores sin formato centralizado
-- Tests reales — solo boilerplate en `test/`
+- Tests reales — solo boilerplate en `test/` (incluido el módulo site-config, verificado a mano).
+- Serving de `/uploads` en prod: `main.ts` ya lo sirve con `useStaticAssets`, pero en el droplet
+  Nginx debe enrutar `/uploads` → backend (o servir el dir) y `uploads/` debe persistir al deploy.
+
+> Ya resueltos (antes figuraban aquí): Swagger (`/api/docs`) y el global exception filter existen.
 
 ## Comandos
 

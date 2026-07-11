@@ -20,6 +20,7 @@ model Lote {
   latitud     Float?
   longitud    Float?
   servicios   Servicio[]
+  contactos   Contacto[]
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 }
@@ -39,6 +40,7 @@ model Contacto {
   telefono  String?
   mensaje   String
   loteId    Int?
+  lote      Lote?    @relation(fields: [loteId], references: [id], onDelete: SetNull)
   leido     Boolean  @default(false)
   createdAt DateTime @default(now())
 }
@@ -49,6 +51,38 @@ model Admin {
   password  String
   nombre    String
   createdAt DateTime @default(now())
+}
+
+/// Configuración editable del sitio público (fila única, id = 1).
+/// La administra el panel; el front la consume para no depender de textos hardcodeados.
+model SiteConfig {
+  id             Int      @id @default(1)
+  // Contacto / footer
+  whatsappNumber String   @default("573000000000")
+  telefono       String   @default("")
+  email          String   @default("")
+  direccion      String   @default("")
+  horario        String   @default("")
+  // Branding
+  marca          String   @default("LotesRB")
+  tagline        String   @default("")
+  // Hero / home
+  heroEyebrow    String   @default("")
+  heroTitulo     String   @default("")
+  heroSubtitulo  String   @default("")
+  heroImagen     String?
+  // Lista de ventajas ("¿por qué elegirnos?"): [{ icono, titulo, desc }]
+  ventajas       Json     @default("[]")
+  // Página Proyecto
+  proyectoMunicipio   String @default("")
+  proyectoNombre      String @default("")
+  proyectoDescripcion String @default("")
+  distancias          Json   @default("[]")   // [{ icono, lugar, detalle }]
+  infraestructura     Json   @default("[]")   // [{ icono, nombre }]
+  pasos               Json   @default("[]")   // [{ icono, titulo, desc }]
+  financiacionTitulo  String @default("")
+  financiacionTexto   String @default("")
+  updatedAt      DateTime @updatedAt
 }
 
 enum EstadoLote {

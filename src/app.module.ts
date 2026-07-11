@@ -7,6 +7,8 @@ import { PrismaModule } from './prisma/prisma.module';
 import { LotesModule } from './lotes/lotes.module';
 import { AuthModule } from './auth/auth.module';
 import { ContactoModule } from './contacto/contacto.module';
+import { UploadModule } from './upload/upload.module';
+import { SiteConfigModule } from './site-config/site-config.module';
 
 @Module({
   imports: [
@@ -25,6 +27,8 @@ import { ContactoModule } from './contacto/contacto.module';
     LotesModule,
     AuthModule,
     ContactoModule,
+    UploadModule,
+    SiteConfigModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
