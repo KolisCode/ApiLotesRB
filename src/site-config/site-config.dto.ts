@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsArray, ValidateNested, MaxLength, Matches, IsUrl } from 'class-validator';
+import { IsString, IsOptional, IsArray, ValidateNested, MaxLength, Matches, IsUrl, ArrayMaxSize } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
@@ -80,7 +80,7 @@ export class UpdateSiteConfigDto {
   @IsUrl({ require_tld: false }) @IsOptional() heroImagen?: string;
 
   @ApiPropertyOptional({ type: [VentajaDto], description: 'Reemplaza la lista completa de ventajas' })
-  @IsArray() @ValidateNested({ each: true }) @Type(() => VentajaDto) @IsOptional() ventajas?: VentajaDto[];
+  @IsArray() @ArrayMaxSize(12) @ValidateNested({ each: true }) @Type(() => VentajaDto) @IsOptional() ventajas?: VentajaDto[];
 
   // ── Página Proyecto ──
   @ApiPropertyOptional({ example: 'Villavicencio, Meta' })
@@ -93,13 +93,13 @@ export class UpdateSiteConfigDto {
   @IsString() @MaxLength(500) @IsOptional() proyectoDescripcion?: string;
 
   @ApiPropertyOptional({ type: [DistanciaDto] })
-  @IsArray() @ValidateNested({ each: true }) @Type(() => DistanciaDto) @IsOptional() distancias?: DistanciaDto[];
+  @IsArray() @ArrayMaxSize(12) @ValidateNested({ each: true }) @Type(() => DistanciaDto) @IsOptional() distancias?: DistanciaDto[];
 
   @ApiPropertyOptional({ type: [InfraestructuraDto] })
-  @IsArray() @ValidateNested({ each: true }) @Type(() => InfraestructuraDto) @IsOptional() infraestructura?: InfraestructuraDto[];
+  @IsArray() @ArrayMaxSize(20) @ValidateNested({ each: true }) @Type(() => InfraestructuraDto) @IsOptional() infraestructura?: InfraestructuraDto[];
 
   @ApiPropertyOptional({ type: [PasoDto] })
-  @IsArray() @ValidateNested({ each: true }) @Type(() => PasoDto) @IsOptional() pasos?: PasoDto[];
+  @IsArray() @ArrayMaxSize(10) @ValidateNested({ each: true }) @Type(() => PasoDto) @IsOptional() pasos?: PasoDto[];
 
   @ApiPropertyOptional({ example: 'Financiación directa con el vendedor' })
   @IsString() @MaxLength(120) @IsOptional() financiacionTitulo?: string;

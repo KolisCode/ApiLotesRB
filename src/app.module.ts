@@ -18,7 +18,8 @@ import { SiteConfigModule } from './site-config/site-config.module';
         DATABASE_URL:           Joi.string().required(),
         JWT_SECRET:             Joi.string().min(32).required(),
         JWT_EXPIRES_IN:         Joi.string().default('15m'),
-        JWT_REFRESH_SECRET:     Joi.string().min(32).required(),
+        // Debe ser distinto de JWT_SECRET: si coinciden, un access token valdría como refresh.
+        JWT_REFRESH_SECRET:     Joi.string().min(32).required().invalid(Joi.ref('JWT_SECRET')),
         JWT_REFRESH_EXPIRES_IN: Joi.string().default('7d'),
         PORT:                   Joi.number().default(3001),
         CORS_ORIGINS:           Joi.string().required(),

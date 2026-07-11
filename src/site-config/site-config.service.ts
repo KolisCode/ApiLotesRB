@@ -10,10 +10,11 @@ const SINGLETON_ID = 1;
 export class SiteConfigService {
   constructor(private prisma: PrismaService) {}
 
-  /** Lectura pública. Si aún no existe la fila, devuelve los defaults (nunca rompe el sitio). */
+  /** Lectura pública. Si aún no existe la fila, devuelve una copia de los defaults
+   *  (nunca rompe el sitio y no expone el objeto mutable compartido). */
   async get() {
     const cfg = await this.prisma.siteConfig.findUnique({ where: { id: SINGLETON_ID } });
-    return cfg ?? DEFAULT_SITE_CONFIG;
+    return cfg ?? { ...DEFAULT_SITE_CONFIG, updatedAt: null };
   }
 
   /** Actualiza (o crea) la fila única con los campos recibidos. */

@@ -5,10 +5,18 @@ import {
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { extname } from 'path';
 import type { Request } from 'express';
 import { Throttle } from '@nestjs/throttler';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+
+// La extensión se deriva del mimetype validado (allowlist), NO del originalname del cliente:
+// evita guardar .svg/.html que, servidos en /uploads (CSP off), darían XSS same-origin.
+const MIME_EXT: Record<string, string> = {
+  'image/jpeg': '.jpg',
+  'image/jpg': '.jpg',
+  'image/png': '.png',
+  'image/webp': '.webp',
+};
 
 @ApiTags('Upload')
 @Controller('upload')
@@ -29,7 +37,7 @@ export class UploadController {
       destination: './uploads',
       filename: (_req, file, cb) => {
         const unique = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-        cb(null, `lote-${unique}${extname(file.originalname).toLowerCase()}`);
+        cb(null, `lote-${unique}${MIME_EXT[file.mimetype] ?? '.bin'}`);
       },
     }),
     limits: { fileSize: 5 * 1024 * 1024 },

@@ -15,9 +15,12 @@ describe('SiteConfigService', () => {
     service = moduleRef.get(SiteConfigService);
   });
 
-  it('get() devuelve los defaults cuando no existe la fila', async () => {
+  it('get() devuelve una COPIA de los defaults cuando no existe la fila', async () => {
     prisma.siteConfig.findUnique.mockResolvedValue(null);
-    await expect(service.get()).resolves.toBe(DEFAULT_SITE_CONFIG);
+    const cfg = await service.get();
+    expect(cfg).not.toBe(DEFAULT_SITE_CONFIG);           // no expone el objeto mutable
+    expect(cfg).toMatchObject({ marca: DEFAULT_SITE_CONFIG.marca });
+    expect(cfg).toHaveProperty('updatedAt', null);       // misma forma que la fila real
   });
 
   it('get() devuelve la fila existente si existe', async () => {

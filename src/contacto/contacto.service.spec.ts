@@ -30,10 +30,13 @@ describe('ContactoService', () => {
     expect(prisma.contacto.create).not.toHaveBeenCalled();
   });
 
-  it('create() guarda cuando no se envía loteId', async () => {
+  it('create() guarda con loteId undefined cuando no se envía', async () => {
     prisma.contacto.create.mockResolvedValue({ id: 1 });
     await service.create(baseDto);
-    expect(prisma.contacto.create).toHaveBeenCalled();
+    expect(prisma.lote.findUnique).not.toHaveBeenCalled(); // no valida lote si no hay loteId
+    expect(prisma.contacto.create).toHaveBeenCalledWith(
+      expect.objectContaining({ data: expect.objectContaining({ loteId: undefined }) }),
+    );
   });
 
   it('findAll(true) filtra solo los no leídos', async () => {
