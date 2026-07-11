@@ -27,8 +27,16 @@ export class LotesController {
     return this.service.stats();
   }
 
+  @Get('slug/:slug')
+  @ApiOperation({ summary: 'Obtener lote por slug' })
+  @ApiResponse({ status: 200, description: 'Detalle del lote' })
+  @ApiResponse({ status: 404, description: 'Lote no encontrado' })
+  findBySlug(@Param('slug') slug: string) {
+    return this.service.findBySlug(slug);
+  }
+
   @Get(':id')
-  @ApiOperation({ summary: 'Obtener lote por ID' })
+  @ApiOperation({ summary: 'Obtener lote por ID (compat; el front redirige al slug)' })
   @ApiResponse({ status: 200, description: 'Detalle del lote' })
   @ApiResponse({ status: 404, description: 'Lote no encontrado' })
   findOne(@Param('id', ParseIntPipe) id: number) {

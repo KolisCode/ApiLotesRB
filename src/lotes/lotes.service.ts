@@ -2,13 +2,14 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { EstadoLote } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateLoteDto, UpdateLoteDto } from './lotes.dto';
+import { slugLote } from '../common/slug';
 
 @Injectable()
 export class LotesService {
   constructor(private prisma: PrismaService) {}
 
   private readonly publicSelect = {
-    id: true, numero: true, manzana: true, area: true, precio: true,
+    id: true, numero: true, slug: true, manzana: true, area: true, precio: true,
     ubicacion: true, estado: true, descripcion: true, imagen: true,
     latitud: true, longitud: true,
     servicios: { select: { id: true, nombre: true, icono: true } },
@@ -40,11 +41,21 @@ export class LotesService {
     return lote;
   }
 
+  async findBySlug(slug: string) {
+    const lote = await this.prisma.lote.findUnique({
+      where: { slug },
+      select: this.publicSelect,
+    });
+    if (!lote) throw new NotFoundException(`Lote "${slug}" no encontrado`);
+    return lote;
+  }
+
   async create(dto: CreateLoteDto) {
     const { servicios, ...data } = dto;
     return this.prisma.lote.create({
       data: {
         ...data,
+        slug: slugLote(data.numero, data.ubicacion),
         servicios: servicios ? { create: servicios } : undefined,
       },
       select: this.publicSelect,
@@ -52,12 +63,16 @@ export class LotesService {
   }
 
   async update(id: number, dto: UpdateLoteDto) {
-    await this.findOne(id);
+    const actual = await this.prisma.lote.findUnique({ where: { id } });
+    if (!actual) throw new NotFoundException(`Lote #${id} no encontrado`);
     const { servicios, ...data } = dto;
+    // Regenera el slug si cambió número o ubicación.
+    const slug = slugLote(data.numero ?? actual.numero, data.ubicacion ?? actual.ubicacion);
     return this.prisma.lote.update({
       where: { id },
       data: {
         ...data,
+        slug,
         servicios: servicios ? { deleteMany: {}, create: servicios } : undefined,
       },
       select: this.publicSelect,

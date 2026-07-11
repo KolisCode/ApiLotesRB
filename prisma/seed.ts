@@ -2,6 +2,7 @@ import 'dotenv/config';
 import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { DEFAULT_SITE_CONFIG } from '../src/site-config/site-config.defaults';
+import { slugLote } from '../src/common/slug';
 
 const prisma = new PrismaClient();
 const BCRYPT_ROUNDS = 12;
@@ -82,7 +83,7 @@ async function main() {
     await prisma.lote.upsert({
       where: { numero: data.numero },
       update: {},
-      create: { ...data, servicios: { create: servicios } },
+      create: { ...data, slug: slugLote(data.numero, data.ubicacion), servicios: { create: servicios } },
     });
   }
 
