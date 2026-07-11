@@ -28,6 +28,7 @@ async function main() {
       numero: 'A-01', manzana: 'A', area: 200, precio: 45000000,
       ubicacion: 'Sector Norte, frente a vía principal', estado: 'disponible' as const,
       descripcion: 'Lote esquinero con excelente iluminación natural y acceso a vía principal.',
+      latitud: 4.1490, longitud: -73.6400,
       servicios: [{ nombre: 'Agua potable', icono: 'water' }, { nombre: 'Energía eléctrica', icono: 'bolt' }, { nombre: 'Alcantarillado', icono: 'drain' }, { nombre: 'Vía pavimentada', icono: 'road' }],
     },
     {
@@ -58,12 +59,14 @@ async function main() {
       numero: 'B-03', manzana: 'B', area: 240, precio: 60000000,
       ubicacion: 'Sector Sur, frente a parque', estado: 'disponible' as const,
       descripcion: 'Lote premium frente al parque comunal, el más amplio del sector.',
+      latitud: 4.1380, longitud: -73.6200,
       servicios: [{ nombre: 'Agua potable', icono: 'water' }, { nombre: 'Energía eléctrica', icono: 'bolt' }, { nombre: 'Gas natural', icono: 'gas' }, { nombre: 'Alcantarillado', icono: 'drain' }, { nombre: 'Vía pavimentada', icono: 'road' }, { nombre: 'Internet', icono: 'wifi' }],
     },
     {
       numero: 'C-01', manzana: 'C', area: 190, precio: 41000000,
       ubicacion: 'Sector Central', estado: 'disponible' as const,
       descripcion: 'Lote en corazón del proyecto, todos los servicios disponibles.',
+      latitud: 4.1440, longitud: -73.6300,
       servicios: [{ nombre: 'Agua potable', icono: 'water' }, { nombre: 'Energía eléctrica', icono: 'bolt' }, { nombre: 'Gas natural', icono: 'gas' }, { nombre: 'Alcantarillado', icono: 'drain' }, { nombre: 'Vía pavimentada', icono: 'road' }],
     },
     {

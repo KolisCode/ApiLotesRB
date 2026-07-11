@@ -15,11 +15,13 @@ import { SiteConfigModule } from './site-config/site-config.module';
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: Joi.object({
-        DATABASE_URL:   Joi.string().required(),
-        JWT_SECRET:     Joi.string().min(32).required(),
-        JWT_EXPIRES_IN: Joi.string().default('2h'),
-        PORT:           Joi.number().default(3001),
-        CORS_ORIGINS:   Joi.string().required(),
+        DATABASE_URL:           Joi.string().required(),
+        JWT_SECRET:             Joi.string().min(32).required(),
+        JWT_EXPIRES_IN:         Joi.string().default('15m'),
+        JWT_REFRESH_SECRET:     Joi.string().min(32).required(),
+        JWT_REFRESH_EXPIRES_IN: Joi.string().default('7d'),
+        PORT:                   Joi.number().default(3001),
+        CORS_ORIGINS:           Joi.string().required(),
       }),
     }),
     ThrottlerModule.forRoot([{ ttl: 60000, limit: 60 }]),

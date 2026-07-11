@@ -8,3 +8,8 @@ export class LoginDto {
   @ApiProperty({ example: 'password123', minLength: 6 })
   @IsString() @MinLength(6) @MaxLength(100) password: string;
 }
+
+export class RefreshDto {
+  @ApiProperty({ example: 'eyJ...' })
+  @IsString() @MaxLength(2000) refreshToken: string;
+}

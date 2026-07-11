@@ -23,11 +23,13 @@ API REST para el sistema de lotes inmobiliarios Robinson. NestJS 11 + Prisma + P
 ## Variables de entorno requeridas
 
 ```env
-DATABASE_URL=           # PostgreSQL connection string
-JWT_SECRET=             # mínimo 32 caracteres
-JWT_EXPIRES_IN=2h       # default
-PORT=3001               # default
-CORS_ORIGINS=           # origen(es) permitidos
+DATABASE_URL=              # PostgreSQL connection string
+JWT_SECRET=                # mínimo 32 caracteres (access token)
+JWT_EXPIRES_IN=15m         # default (access corto)
+JWT_REFRESH_SECRET=        # mínimo 32, distinto de JWT_SECRET (refresh token)
+JWT_REFRESH_EXPIRES_IN=7d  # default
+PORT=3001                  # default
+CORS_ORIGINS=              # origen(es) permitidos
 ```
 
 ## Módulos
@@ -89,7 +91,9 @@ El módulo contacto expone `DELETE /contacto/:id` (admin).
 - Solo existe un modelo `Admin` (no usuarios públicos)
 - Guard `JwtAuthGuard` protege todos los endpoints `/admin/*`
 - Token en header `Authorization: Bearer {token}`
-- Sin refresh tokens — al vencer, el cliente debe hacer login de nuevo
+- **Refresh tokens**: `login` devuelve `{ access_token, refresh_token }`; `POST /auth/refresh`
+  canjea el refresh (secreto y expiración propios) por un par nuevo (rotación). El access es
+  corto (15m); el refresh dura 7d. El access NO sirve como refresh (secretos distintos).
 
 ## Lo que falta
 

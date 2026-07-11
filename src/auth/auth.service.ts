@@ -1,5 +1,6 @@
 import { Injectable, UnauthorizedException, Logger, OnModuleInit } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import { LoginDto } from './auth.dto';
 import * as bcrypt from 'bcrypt';
@@ -14,10 +15,22 @@ export class AuthService implements OnModuleInit {
   constructor(
     private prisma: PrismaService,
     private jwt: JwtService,
+    private config: ConfigService,
   ) {}
 
   async onModuleInit() {
     this.dummyHash = await bcrypt.hash(Math.random().toString(), BCRYPT_ROUNDS);
+  }
+
+  /** Firma el par access + refresh (el refresh usa su propio secreto y expira más tarde). */
+  private firmarTokens(admin: { id: number; email: string }) {
+    const payload = { sub: admin.id, email: admin.email };
+    const access_token = this.jwt.sign(payload);
+    const refresh_token = this.jwt.sign(payload, {
+      secret: this.config.get<string>('JWT_REFRESH_SECRET')!,
+      expiresIn: this.config.get<string>('JWT_REFRESH_EXPIRES_IN') as any,
+    });
+    return { access_token, refresh_token };
   }
 
   async login(dto: LoginDto) {
@@ -30,9 +43,29 @@ export class AuthService implements OnModuleInit {
       throw new UnauthorizedException('Credenciales inválidas');
     }
 
-    const token = this.jwt.sign({ sub: admin.id, email: admin.email });
     this.logger.log(`Login exitoso: ${admin.email}`);
-    return { access_token: token, admin: { id: admin.id, email: admin.email, nombre: admin.nombre } };
+    return {
+      ...this.firmarTokens(admin),
+      admin: { id: admin.id, email: admin.email, nombre: admin.nombre },
+    };
+  }
+
+  /** Canjea un refresh token válido por un par nuevo (rotación). */
+  async refresh(refreshToken: string) {
+    let payload: { sub: number; email: string };
+    try {
+      payload = this.jwt.verify(refreshToken, {
+        secret: this.config.get<string>('JWT_REFRESH_SECRET')!,
+      });
+    } catch {
+      throw new UnauthorizedException('Refresh token inválido o expirado');
+    }
+
+    // El admin debe seguir existiendo (revoca sesiones si se borró la cuenta).
+    const admin = await this.prisma.admin.findUnique({ where: { id: payload.sub } });
+    if (!admin) throw new UnauthorizedException('Cuenta no encontrada');
+
+    return this.firmarTokens(admin);
   }
 
   async crearAdmin(email: string, password: string, nombre: string) {
