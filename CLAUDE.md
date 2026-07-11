@@ -92,8 +92,11 @@ El módulo contacto expone `DELETE /contacto/:id` (admin).
 - Guard `JwtAuthGuard` protege todos los endpoints `/admin/*`
 - Token en header `Authorization: Bearer {token}`
 - **Refresh tokens**: `login` devuelve `{ access_token, refresh_token }`; `POST /auth/refresh`
-  canjea el refresh (secreto y expiración propios) por un par nuevo (rotación). El access es
-  corto (15m); el refresh dura 7d. El access NO sirve como refresh (secretos distintos).
+  canjea el refresh (secreto y expiración propios) por un par nuevo. El access es corto (15m);
+  el refresh dura 7d. `JWT_REFRESH_SECRET` **debe** diferir de `JWT_SECRET` (Joi lo valida).
+- ⚠️ **Refresh es stateless**: la "rotación" NO invalida el refresh anterior (sin `jti`/denylist),
+  y cambiar password / borrar admin no revoca tokens ya emitidos. Aceptable para un solo admin;
+  para revocación real haría falta `tokenVersion` en `Admin`. Ver `docs/BACKLOG-lotesRB.md`.
 
 ## Lo que falta
 
