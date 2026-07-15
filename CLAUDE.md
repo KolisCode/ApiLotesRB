@@ -41,9 +41,10 @@ src/
 │   ├── auth.service.ts
 │   └── jwt.strategy.ts
 ├── lotes/              ← catálogo público + CRUD admin
-│   ├── lotes.controller.ts
-│   ├── lotes.service.ts
+│   ├── lotes.controller.ts  — GET /lotes, /lotes/slug/:slug (público), /lotes/:id (compat), CRUD (JWT)
+│   ├── lotes.service.ts     — genera slug en create/update (src/common/slug.ts)
 │   └── lotes.dto.ts    — valida lat/lng (-90/90 y -180/180)
+├── common/slug.ts      ← slugLote(numero, ubicacion) → slug URL-safe único
 ├── contacto/           ← formulario de contacto público
 │   └── contacto.controller.ts  — @Throttle 5/min
 ├── upload/             ← subida de imágenes (lotes, hero, branding) — @Throttle 10/min
@@ -62,26 +63,34 @@ src/
 ```prisma
 model Lote {
   id          Int        @id @default(autoincrement())
-  numero      String
+  numero      String     @unique
+  slug        String?    @unique   // URL amigable (lote-a-01-sector-norte); migración lote_slug
   manzana     String
   area        Float
   precio      Float
   ubicacion   String
-  estado      EstadoLote @default(DISPONIBLE)
+  estado      EstadoLote @default(disponible)
   descripcion String?
   imagen      String?
   latitud     Float?
   longitud    Float?
   servicios   Servicio[]
+  contactos   Contacto[]
 }
 
-enum EstadoLote { disponible reservado vendido }   // ⚠️ minúsculas en el código real
+enum EstadoLote { disponible reservado vendido }   // minúsculas
 ```
+
+**URLs por slug:** el detalle público se sirve por `GET /lotes/slug/:slug` (el front no expone el
+id). El slug se genera con `src/common/slug.ts` en create/update; es único porque el `numero` va en
+él. `GET /lotes/:id` se conserva para compat (el front redirige al slug). Backfill: `node -e` que
+reusa `slugLote`.
 
 Además existe `model SiteConfig` (fila única id=1) con la config editable del sitio:
 contacto (whatsapp/telefono/email/direccion/horario), branding (marca/tagline), hero*,
 `ventajas` (Json) y **la página Proyecto** (proyectoMunicipio/Nombre/Descripcion,
-`distancias`/`infraestructura`/`pasos` Json, financiacion*).
+`distancias`/`infraestructura`/`pasos` Json, financiacion*). Default `marca = "TuLote"`
+(en `site-config.defaults.ts`); GET público cae a esos defaults si no hay fila.
 
 `Contacto.loteId` es **FK real** a `Lote` con `onDelete: SetNull` (migración `contacto_lote_fk`).
 El módulo contacto expone `DELETE /contacto/:id` (admin).
